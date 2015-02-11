@@ -38,3 +38,37 @@ Git教程 - 廖雪峰
 	$ git config --global user.name "Your name"
 	$ git config --global user.email "email@example.com"
 	注意：--global参数表示为这台机器上所有仓库都是用这个配置；也可以对每个仓库指定不同的用户名和Email。
+	
+3. 创建版本库repository
+3.1 新建版本库
+	3.1.1 创建目录
+	新建一个目录，用来存放版本库(父目录尽量避免包含英文与空格)。
+	命令：
+	$ mkdir learngit
+	$ cd learngit
+	
+	3.2.1 初始化Git仓库
+	把目录变成Git可管理的仓库：
+	$ git init
+	Initialized empty Git repository in /Users/michael/learngit/.git/
+	初始化后，生成一个.git管理目录。
+	Git只能跟踪文本文件的改动，推荐统一使用UTF8编码、无BOM格式(编码与格式不同也会被识别为改动)。
+	
+4. 添加&提交
+4.1 添加文件或变更
+	使用命令git add <file> ，把文件或变更添加到仓库：
+	$ git add file1.txt 
+	添加文件file1.txt。
+	$ git add .
+	添加目录下所有的文件变更。
+
+4.2 提交变更
+	使用命令 git commit -m <msg> 提交变更:
+	$ git commit -m "wrote a readme file"
+	[master (root-commit) cb926e7] wrote a readme file
+	 1 file changed, 2 insertions(+)
+	 create mode 100644 readme.txt
+	一次可以提交多次add的文件或变更。
+	
+	
+	
