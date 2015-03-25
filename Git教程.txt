@@ -15,7 +15,7 @@ Git教程 - 廖雪峰
 	1.2.3 源代码安装：
 	从Git官网下载源码；依次执行命令：
 	./config
-	make
+	makes
 	sudo make install
 	
 1.2 Mac OS X
@@ -34,11 +34,34 @@ Git教程 - 廖雪峰
 	1.3.2 msysgit
 	下载地址：http://msysgit.github.io
 	
-2. 初始化Git-设置用户名&邮箱
+2.	git 配置 
+2.1 初始化Git-设置用户名&邮箱
 	$ git config --global user.name "Your name"
 	$ git config --global user.email "email@example.com"
 	注意：--global参数表示为这台机器上所有仓库都是用这个配置；也可以对每个仓库指定不同的用户名和Email。
 	
+2.2 远程仓库
+	2.2.1 GitHub https://github.com/
+		世界最NB的Git仓库托管服务，公开仓库免费，私有仓库收费。
+		
+	2.2.2 Git@OSC http://git.oschina.net/
+		国内的Git仓库托管服务，速度优于GitHub， 可以创建免费的私有仓库，基于开源的Gitlab创建。
+	备注：账号，请自己搞定。
+	
+2.3 设置SSH key
+	2.3.1 创建ssh key
+		在用户主目录下，看看有没有.ssh目录，如果有，再看看这个目录下有没有id_rsa和id_rsa.pub这两个文件，如果已经有了，可直接跳到下一步。
+		打开Shell（Windows下打开Git Ghell），创建SSH Key：
+		$ ssh-keygen -t rsa -C "youremail@example.com"
+		命令执行完成后，在用户主目录里找到.ssh目录。id_rsa是私钥，id_rsa.pub是公钥。
+		
+		打开Github或Git@OSC:
+		GitHub -> settings -> SSH keys -> Add SSH key, 填上任意Title，在Key文本框里粘贴id_rsa.pub文件的内容.
+		Git@OSC -> 个人资料 -> SSH 公钥，填上任意标题，在公钥文本框里粘贴id_rsa.pub文件的内容.
+		添加完成后运行：
+		ssh -T git@git.oschina.net
+		Welcome to Git@OSC, yourname! 
+		
 3. 创建版本库repository
 3.1 新建版本库
 	3.1.1 创建目录
@@ -47,24 +70,92 @@ Git教程 - 廖雪峰
 	$ mkdir learngit
 	$ cd learngit
 	
-	3.2.1 初始化Git仓库
+	3.1.2 初始化Git仓库
 	把目录变成Git可管理的仓库：
 	$ git init
 	Initialized empty Git repository in /Users/michael/learngit/.git/
 	初始化后，生成一个.git管理目录。
 	Git只能跟踪文本文件的改动，推荐统一使用UTF8编码、无BOM格式(编码与格式不同也会被识别为改动)。
 	
-4. 基本Git操作
-4.1 察看仓库状态：
-	使用命令 git status 察看仓库状态
-4.3 添加文件或变更
+	3.1.3 与远程库建立关系
+	使用 命令 git remote add origin <origin> 将本地仓库与远程仓库建立联系。origin是Git远程仓库的默认叫法。
+	$ git remote add origin git@github.com:michaelliao/learngit.git
+	第一次推送，可以使用命令将本地仓库推送到远程仓库， -u
+	$ git push -u origin master
+	以后再推送提交就可以使用
+	$ git push origin master
+	
+3.2 从远程仓库克隆本地仓库
+	首先在GitHub或Git OSC上建立一个版本库。
+	使用git clone克隆一个本地仓库。
+	$ git clone git@github.com:michaelliao/gitskills.git
+	Cloning into 'gitskills'...
+	remote: Counting objects: 3, done.
+	remote: Total 3 (delta 0), reused 0 (delta 0)
+	Receiving objects: 100% (3/3), done.
+	
+	仓库地址支持多种协议：
+	https://github.com/michaelliao/gitskills.git	https协议
+	git@github.com:michaelliao/gitskills.git		git://使用ssh协议
+	
+	当你从远程仓库克隆时，实际上Git自动把本地的master分支和远程的master分支对应起来了，并且，远程仓库的默认名称是origin。
+	
+3.3 查看远程库信息：
+	要查看远程库的信息，用git remote：
+	$ git remote
+	origin
+	或者，用git remote -v显示更详细的信息：
+	$ git remote -v
+	origin  git@github.com:michaelliao/learngit.git (fetch)
+	origin  git@github.com:michaelliao/learngit.git (push)
+	上面显示了可以抓取和推送的origin的地址。如果没有推送权限，就看不到push的地址。
+	
+4. 基本概念
+	4.1 工作区（Working Directory）
+		工作区就是电脑里能看到的目录，如新建的liearngit目录
+	
+	4.2 版本库（Repository）
+		工作区有一个隐藏目录.git，这个不算工作区，而是Git的版本库。
+		版本库中包含很多内容，最重要的三个是：
+			缓冲区\暂存区(stage)
+			分支 - 默认分支是 master 分支
+			HEAD指针 指向master分支当前的版本
+			
+	4.3 一般操作的背后
+		git add 将工作区(Working Directory)的修改添加到缓冲区(stage)
+		git commit 将缓冲区(stage)的内容提交到当前的分支
+		git commit 后，工作去(Working Directory)就是"干净"的。
+	
+	4.4 指针
+		HEAD指针指向当前分支
+		当前分支指针(如master)指向该分支最新的提交
+		创建分支时，创建分支指针，指向提交。
+		删除分支时，删除分支指针，不会删除提交。
+		
+		
+5. 基本Git操作
+5.1 察看仓库状态：
+	使用命令 git status 察看仓库当前状态。状态包括：
+	<1> 修改未添加 - 使用 git add 命令将文件添加到缓冲区(staged)
+	# Changes not staged for commit:
+	<2> 缓冲未提交 - 使用 git commit 命令提交
+	# Changes to be committed:
+	<3> 干净工作区
+	nothing to commit (working directory clean)
+	
+	
+5.2 查看difference
+	使用命令 git diff 查看差异，差异的显示格式是Unix通用的diff格式。
+	$ git diff <file>
+	
+5.3 添加文件或变更
 	使用命令git add <file> ，把文件或变更添加到仓库：
 	$ git add file1.txt 
 	添加文件file1.txt。
 	$ git add .
 	添加目录下所有的文件变更。
 
-4.4 提交变更
+5.4 提交变更
 	使用命令 git commit -m <msg> 提交变更:
 	$ git commit -m "wrote a readme file"
 	[master (root-commit) cb926e7] wrote a readme file
@@ -72,7 +163,218 @@ Git教程 - 廖雪峰
 	 create mode 100644 readme.txt
 	一次可以提交多次add的文件或变更。
 	
+5.5 查看版本日志
+	5.5.1 git log 命令查看版本日志：
+	$ git log
+	commit 3628164fb26d48395383f8f31179f24e0882e1e0		// commit id
+	Author: Michael Liao <askxuefeng@gmail.com>			// 提交人
+	Date:   Tue Aug 20 15:11:49 2013 +0800				// 提交日期
+
+		append GPL										// 描述 -m "xxx"
+
+	commit ea34578d5496d7dd233c827ed32a8cd576c5ee85
+	Author: Michael Liao <askxuefeng@gmail.com>
+	Date:   Tue Aug 20 14:53:12 2013 +0800 
 	
+		add distributed
 	
+	5.5.2 --pretty=oneline 参数减少输出信息，方便查看
+	$ git log --pretty=oneline
+	3628164fb26d48395383f8f31179f24e0882e1e0 append GPL				// commit id + 描述
+	ea34578d5496d7dd233c827ed32a8cd576c5ee85 add distributed		// 按提交顺序由近至远显示
+	cb926e7ea50ad11b8f9e909c05226233bf755030 wrote a readme file
+		
+5.6 查看命令日志
+	使用命令git reflog记录每一次版本变更命令，借此，可以查看commit id：
+	$ git reflog
+	ea34578 HEAD@{0}: reset: moving to HEAD^
+	3628164 HEAD@{1}: commit: append GPL
+	ea34578 HEAD@{2}: commit: add distributed
+	cb926e7 HEAD@{3}: commit (initial): wrote a readme file
+	
+5.7 版本回退
+	5.7.1 版本表示：
+	HEAD		当前版本
+	HEAD^ 		上一个版本
+	HEAD^^		上上一个版本
+	HEAD~<n>	上n个版本， 如HEAD~100 
+	<commit id>	指定commit id 的版本
+	
+	5.7.2 git reset 命令退回到某一版本
+	$ git reset --hard HEAD^		\\ 退回上一版本
+	HEAD is now at ea34578 add distributed
+	可以使用 5.7.1 中任意表示方式指定版本。使用commit id 时，commit id不用写全，能够唯一区分即可(我傻，这么长我肯定记不住，也懒的输全。你要非较真输全了，那你更傻。)
+	--hard 参数不解释。
+	
+5.8 撤销修改
+	5.8.1 撤销工作区的修改
+		git checkout -- <file> 可以丢弃工作区的修改
+		$ git checkout -- readme.txt
+		撤销后的两种状态：
+		一种是readme.txt自修改后还没有被放到暂存区，现在，撤销修改就回到和版本库一模一样的状态，恢复到最后一次commit状态；
+		一种是readme.txt已经添加到暂存区后，又作了修改，现在，撤销修改就回到添加到暂存区后的状态，恢复到最后一次add状态；
+		
+	5.8.2 撤销缓冲区的修改
+		git reset命令既可以回退版本，也可以把暂存区的修改回退到工作区。
+		git reset HEAD <file> 以把暂存区的修改撤销掉（unstage），重新放回工作区。这样可以撤销git add之后，git commit之前的版本。
+		
+	5.8.3 撤销提交到版本库的修改
+		参考5.7 版本回退
+	
+	5.8.4 撤销推送到远程版本库的修改？
+		我实在没有办法了，痕迹肯定会留下了。
+		
+5.9 删除文件
+	git rm 命令用于从版本库中删除文件。
+	从版本库中删除该文件，那就用命令git rm删掉，并且git commit提交修改：
+		$ git rm test.txt
+		rm 'test.txt'
+		$ git commit -m "remove test.txt"
+		[master d17efd8] remove test.txt
+		1 file changed, 1 deletion(-)
+		delete mode 100644 test.txt
+		
+5.10 推送本地内容到远程仓库
+	以后再推送提交就可以使用
+	$ git push origin master
+	
+6.	分支管理
+6.1 创建分支
+	可以使用命令 git checkout 加上参数 -b 完成创建并切换分支的操作：
+	$ git checkout -b dev
+	Switched to a new branch 'dev'
+	
+	也可以使用命令 git branch 创先新的分支，再使用命令git checkout 切换到新的分支。
+	$ git branch dev
+	$ git checkout dev
+	Switched to branch 'dev'
+	
+6.2 查看当前分支
+	可以使用命令git branch 查看所有分支及当前分支(即当前HEAD指针指向的分支指针)。
+	$ git branch
+	* dev
+	  master
+	
+6.3 切换分支
+	使用命令 git checkout 分支名 切换回对应分支。
+	$ git checkout master
+	Switched to branch 'master'
+	
+6.4 合并分支
+	使用命令 git merge 待合并分支名 命令合并分支，使用命令前需要切换到期望合并的主分支上。
+	例如，将dev分支的修改合并到master 分支上来，首先需要切换到master分支，然后执行命令：
+	$ git merge dev
+	Updating d17efd8..fec145a
+	Fast-forward
+	 readme.txt |    1 +
+	 1 file changed, 1 insertion(+)
+	上述合并使用的是Fast-forward(快进模式)，直接把master指向dev当前的提交，只有在dev比master只有新增，没有冲突时才可以(自动)使用。
+	
+	使用 git merge 加上 --no-ff 参数，可以禁用 Fast forward
+	例如：
+	$ git merge --no-ff -m "merge with no-ff" dev
+	Merge made by the 'recursive' strategy.
+	 readme.txt |    1 +
+	 1 file changed, 1 insertion(+)
+	非 Fast forward 合并会创建一个新的commit，所以使用-m，加上commit描述。
+	
+
+6.5 删除分支
+	使用命令 git branch -d 分支名，来删除分支。
+	例如删除dev分支：
+	$ git branch -d dev
+	Deleted branch dev (was fec145a).
+	删除后可以使用 git branch查看所有分支，没有dev分支了：
+	$ git branch
+	* master	
+	
+	强行删除分支
+	如果分支还没有被合并，想要删除分支将会丢失掉修改，如果要强行删除，需要使用命令 git branch -D 分支名:
+	$ git branch -D feature-vulcan
+	branch feature-vulcan (was 756d4af).
+	
+6.6 合并分支时解决冲突
+	当两个分支各自都有提交时，可能会出现冲突，Git无法执行“快速合并”。
+	例如：
+	$ git merge feature1
+	Auto-merging readme.txt
+	CONFLICT (content): Merge conflict in readme.txt
+	Automatic merge failed; fix conflicts and then commit the result.
+	Git 提示 自动合并 readme.txt文件是返现冲突。冲突在readme.txt文件中，自动合并失败，需要我们手工解决冲突后在提交结果。
+	git status 命令也可以告诉我们冲突的文件：
+	$ git status
+	# On branch master
+	# Your branch is ahead of 'origin/master' by 2 commits.
+	#
+	# Unmerged paths:
+	#   (use "git add/rm <file>..." as appropriate to mark resolution)
+	#
+	#       both modified:      readme.txt
+	#
+	no changes added to commit (use "git add" and/or "git commit -a")
+	
+	查看readme.txt文件：
+	我们可以直接查看readme.txt的内容：
+	<<<<<<< HEAD
+	Creating a new branch is quick & simple.
+	=======
+	Creating a new branch is quick AND simple.
+	>>>>>>> feature1
+	Git用<<<<<<<，=======，>>>>>>>标记出不同分支的内容，我们修改如下后保存：
+	Creating a new branch is quick and simple.
+	再提交。
+	
+6.7 查看分支合并情况
+	使用用带参数的git log命令 可以看到分支的合并情况：
+	$ git log --graph --pretty=oneline --abbrev-commit
+	*   59bc1cb conflict fixed
+	|\
+	| * 75a857c AND simple
+	* | 400b400 & simple
+	|/
+	* fec145a branch test
+	
+6.8 缓存工作区
+	可以使用 git stash 命令隐藏工作区。
+	如果当前分支的工作区存在没有提交的内容，又想打开一个新的分支来修改一个紧急的bug时，可以使用stash功能，把当前工作现场“储藏”起来，等以后恢复现场后继续工作：
+	$ git stash
+	Saved working directory and index state WIP on dev: 6224937 add merge
+	HEAD is now at 6224937 add merge
+	隐藏后使用git status查看工作区，就是干净的(除非有没有被Git管理的文件)。
+	隐藏完成后，可以切换到适当的分支或创建相应的分支去解决问题，解决完成后提交。
+	
+	恢复到目标分支后，可以使用git stash list 命令查看缓存的工作现场：
+	$ git stash list
+	stash@{0}: WIP on dev: 6224937 add merge
+	工作现场还在，Git把stash内容存在某个地方了，但是需要恢复一下，有两个办法：
+	一是用git stash apply恢复，但是恢复后，stash内容并不删除，你需要用git stash drop来删除；
+	另一种方式是用git stash pop，恢复的同时把stash内容也删了。
+	
+	你可以多次stash，恢复的时候，先用git stash list查看，然后恢复指定的stash，用命令：
+	$ git stash apply stash@{0}
+	
+6.9 推送分支
+	推送分支，就是把该分支上的所有本地提交推送到远程库。
+	推送时要指定将要推送的本地分支，这样，Git就会把该分支推送到远程库对应的远程分支上：
+	$ git push origin master
+	推送dev 分支
+	$ git push origin dev
+	在Git中，分支完全可以在本地自己藏着玩，是否推送，视你的心情而定！一般情况下：
+    · master分支是主分支，因此要时刻与远程同步；
+    · dev分支是开发分支，团队所有成员都需要在上面工作，所以也需要与远程同步；
+    · bug分支只用于在本地修复bug，就没必要推到远程了，除非老板要看看你每周到底修复了几个bug；
+    · feature分支是否推到远程，取决于你是否和你的小伙伴合作在上面开发。
+6.10 抓取分支
+	多人协作时，大家都会往master和dev分支上推送各自的修改。团队成员需要克隆远程库、抓取分支
+	6.10.1 克隆远程库
+	使用命令git clone克隆远程库，需要添加SSH。
+	远程库clone时，默认情况下，只能看到本地的master分支。
+	$ git clone git@github.com:michaelliao/learngit.git
+	Cloning into 'learngit'...
+	remote: Counting objects: 46, done.
+	remote: Compressing objects: 100% (26/26), done.
+	remote: Total 46 (delta 16), reused 45 (delta 15)
+	Receiving objects: 100% (46/46), 15.69 KiB | 6 KiB/s, done.
+	Resolving deltas: 100% (16/16), done.
 	
 	
