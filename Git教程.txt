@@ -110,6 +110,12 @@ Git教程 - 廖雪峰
 	origin  git@github.com:michaelliao/learngit.git (push)
 	上面显示了可以抓取和推送的origin的地址。如果没有推送权限，就看不到push的地址。
 	
+3.4 建立本地分支与远程分支的连接
+	设置dev和origin/dev的链接：
+	$ git branch --set-upstream dev origin/dev
+	Branch dev set up to track remote branch dev from origin.
+
+	
 4. 基本概念
 	4.1 工作区（Working Directory）
 		工作区就是电脑里能看到的目录，如新建的liearngit目录
@@ -364,6 +370,7 @@ Git教程 - 廖雪峰
     · dev分支是开发分支，团队所有成员都需要在上面工作，所以也需要与远程同步；
     · bug分支只用于在本地修复bug，就没必要推到远程了，除非老板要看看你每周到底修复了几个bug；
     · feature分支是否推到远程，取决于你是否和你的小伙伴合作在上面开发。
+
 6.10 抓取分支
 	多人协作时，大家都会往master和dev分支上推送各自的修改。团队成员需要克隆远程库、抓取分支
 	6.10.1 克隆远程库
@@ -377,4 +384,86 @@ Git教程 - 廖雪峰
 	Receiving objects: 100% (46/46), 15.69 KiB | 6 KiB/s, done.
 	Resolving deltas: 100% (16/16), done.
 	
+	6.10.2 创建远程分支的本地版本
+	创建远程origin的dev分支到本地，于是他用这个命令创建本地dev分支：
+	$ git checkout -b dev origin/dev
+
+	6.10.3 推送分支到远程仓库
+	$ git push origin dev
+	Counting objects: 5, done.
+	Delta compression using up to 4 threads.
+	Compressing objects: 100% (2/2), done.
+	Writing objects: 100% (3/3), 349 bytes, done.
+	Total 3 (delta 0), reused 0 (delta 0)
+	To git@github.com:michaelliao/learngit.git
+		fc38031..291bea8  dev -> dev
 	
+	6.10.4 推送冲突解决
+	多人协作的工作模式通常是这样：
+	· 首先，可以试图用git push origin branch-name推送自己的修改；
+    · 如果推送失败，则因为远程分支比你的本地更新，需要先用git pull试图合并；
+    · 如果合并有冲突，则解决冲突，并在本地提交；
+    · 没有冲突或者解决掉冲突后，再用git push origin branch-name推送就能成功！
+	
+7.	标签管理
+	标签也是版本库的一个快照。无论什么时候，取某个标签的版本，就是把那个打标签的时刻的历史版本取出来。
+	Git的标签虽然是版本库的快照，但其实它就是指向某个commit的指针.
+7.1 创建标签
+	切换到需要打标签的分支上；
+	命令git tag <name>就可以打一个新标签：
+	$ git tag v1.0
+	
+	默认标签是打在最新提交的commit上的，可以使用历史提交的commit id，为历史提交打标签：
+	如对应的commit id是6224937，敲入命令：
+	$ git tag v0.9 6224937
+	
+	创建带有说明的标签，用-a指定标签名，-m指定说明文字：
+	$ git tag -a v0.1 -m "version 0.1 released" 3628164
+	
+	还可以通过-s用私钥签名一个标签：
+	$ git tag -s v0.2 -m "signed version 0.2 released" fec145a
+
+7.2 查看标签
+	命令git tag查看所有标签，标签不是按时间顺序列出，而是按字母排序的：
+	$ git tag
+	v0.9
+	v1.0
+	可以用git show <tagname>查看标签信息：
+	$ git show v0.9
+	commit 622493706ab447b6bb37e4e2a2f276a20fed2ab4
+	Author: Michael Liao <askxuefeng@gmail.com>
+	Date:   Thu Aug 22 11:22:08 2013 +0800
+	
+		add merge
+		
+7.3 推送标签到远程
+	如果要推送某个标签到远程，使用命令git push origin <tagname>：
+	$ git push origin v1.0
+	Total 0 (delta 0), reused 0 (delta 0)
+	To git@github.com:michaelliao/learngit.git
+	* [new tag]         v1.0 -> v1.0
+	
+	一次性推送全部尚未推送到远程的本地标签：
+	$ git push origin --tags
+	Counting objects: 1, done.
+	Writing objects: 100% (1/1), 554 bytes, done.
+	Total 1 (delta 0), reused 0 (delta 0)
+	To git@github.com:michaelliao/learngit.git
+	* [new tag]         v0.2 -> v0.2
+	* [new tag]         v0.9 -> v0.9	
+
+7.4 删除标签
+	标签也可以通过 -d 参数删除：
+	$ git tag -d v0.1
+	Deleted tag 'v0.1' (was e078af9)
+	因为创建的标签都只存储在本地，不会自动推送到远程。所以，打错的标签可以在本地安全删除。
+	
+	如果标签已经推送到远程，要删除远程标签就麻烦一点，先从本地删除：
+	$ git tag -d v0.9
+	Deleted tag 'v0.9' (was 6224937)
+	
+	然后，从远程删除。删除命令也是push，但是格式如下：
+
+	$ git push origin :refs/tags/v0.9
+	To git@github.com:michaelliao/learngit.git
+	 - [deleted]         v0.9
